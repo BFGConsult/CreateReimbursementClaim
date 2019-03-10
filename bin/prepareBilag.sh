@@ -1,8 +1,9 @@
 #!/bin/bash
 
 prepare () {
-    echo Prepare is not ready
-    exit 1
+    tgt=${1%.*}.pdf
+    docConvert.sh $1 $tgt
+    echo $tgt
 }
 
 while [ -n "$1" ]
@@ -29,22 +30,27 @@ do
 	continue
     fi
 
-    #if [ $(find ${DIR} -maxdepth 1 -type f | wc -l) -ne 1 ]
-    if [ $(find ${DIR} -maxdepth 1 -type f -name '*.pdf' | wc -l) -ne 1 ]
+    if [ $(find ${DIR} -maxdepth 1 -type f | wc -l) -ne 1 ]
     then
-	echo "'${DIR}' must contain exactly one expense report"
-	continue
+	if [ $(find ${DIR} -maxdepth 1 -type f -name '*.pdf' | wc -l) -ne 1 ]
+	then
+	   echo "'${DIR}' must contain exactly one expense report"
+	   continue
+	else
+	    report=$(find ${DIR} -maxdepth 1 -type f -name '*.pdf')
+	fi
+    else
+	report=$(find ${DIR} -maxdepth 1 -type f)
     fi
 
     TMPDIR=$(mktemp -d)
     echo $TMPDIR
 
-    report=$(find ${DIR} -maxdepth 1 -type f -name '*.pdf')
 
     if [[ $report != *.pdf ]]
     then
-	echo "'${report}' is not a pdf file"
-	report=$(prepare $report)
+	echo "'${report}' is not a pdf file - converting"
+	report=$(prepare "${report}")
     fi
     echo $report
     	
@@ -52,13 +58,13 @@ do
     do
 	if [[ $file != *.pdf ]]
 	then
-	    echo "'${file}' is not a pdf file"
+	    echo "'${file}' is not a pdf file - converting"
 	    file=$(prepare $file)
 	fi
 	
     done
 
-    "/System/Library/Automator/Combine PDF Pages.action/Contents/Resources/join.py" -o ${DIR}.pdf $report ${DIR}/Bilag/*
+    "/System/Library/Automator/Combine PDF Pages.action/Contents/Resources/join.py" -o ${DIR}.pdf $report ${DIR}/Bilag/*.pdf
 
     rmdir $TMPDIR
 done
