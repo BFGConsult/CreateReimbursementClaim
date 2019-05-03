@@ -2,7 +2,7 @@
 
 prepare () {
     tgt=${1%.*}.pdf
-    docConvert.sh $1 $tgt
+    docConvert $1 $tgt
     echo $tgt
 }
 
@@ -67,4 +67,6 @@ do
     "/System/Library/Automator/Combine PDF Pages.action/Contents/Resources/join.py" -o ${DIR}.pdf $report ${DIR}/Bilag/*.pdf
 
     rmdir $TMPDIR
+
+    echo "Assembled as '${DIR}.pdf'"
 done
