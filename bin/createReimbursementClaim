@@ -10,4 +10,4 @@ else
     echo Utleggsskjema eksisterer allerede.
 fi
 
-prepareBilag.sh $dir
+prepareReimbursementClaim $dir
